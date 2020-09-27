@@ -1,6 +1,6 @@
 using System;
 
-namespace SudokuWorld.Models
+namespace SudokuWorld.Models.ViewModels
 {
     public class ErrorViewModel
     {

@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SudokuWorld.Models;
+using SudokuWorld.Models.ViewModels;
 
-namespace SudokuWorld.Controllers
+namespace SudokuWorld.Areas.Players.Controllers
 {
+    [Area("Players")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

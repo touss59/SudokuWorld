@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SudokuWorld.Models;
 
-namespace SudokuWorld.Data
+namespace SudokuWorld.DataAccess.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
@@ -12,5 +13,7 @@ namespace SudokuWorld.Data
             : base(options)
         {
         }
+
+        public DbSet<Grid> Grids { get; set; }
     }
 }
