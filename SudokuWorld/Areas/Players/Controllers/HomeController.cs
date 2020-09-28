@@ -30,6 +30,11 @@ namespace SudokuWorld.Areas.Players.Controllers
             return View();
         }
 
+        public IActionResult Grids(string level)
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
