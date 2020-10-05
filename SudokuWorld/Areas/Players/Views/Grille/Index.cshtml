@@ -1,0 +1,238 @@
+﻿@model SudokuWorld.Models.Grid
+@{
+    ViewData["Title"] = "Index";
+}
+<style>
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .container {
+        text-align:center;
+        width: 60%;
+    }
+
+    .number {
+        text-align: center;
+        width: 100%;
+    }
+
+    table {
+        margin: 1em auto;
+    }
+
+    td {
+        height: 30px;
+        width: 30px;
+        border: 1px solid;
+        text-align: center;
+    }
+
+        td:first-child {
+            border-left: solid;
+        }
+
+        td:nth-child(3n) {
+            border-right: solid;
+        }
+
+    tr:first-child {
+        border-top: solid;
+    }
+
+    tr:nth-child(3n) td {
+        border-bottom: solid;
+    }
+</style>
+<div>
+    <h1>A vous de jouer</h1>
+    <div class="container">
+        <table>
+            @{
+                for (int i = 0; i < 9; i++)
+                {
+                    <tr>
+                        @for (int j = i * 9; j < i * 9 + 9; j++)
+                        {
+                            <td>
+                                <input class="number" type="text" value="@Model.Value[j]" />
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+        </table>
+        <button id="submitGrid" class="alert-secondary">Submit</button>
+        <button id="correction" class="alert-secondary">Correction</button>
+    </div>
+</div>
+<script>
+    let GridValue = "@Model.Value";
+
+
+    // Convert the string into an array 9x9
+    function PutGridValueIntoTable(Grid) {
+        let GridCompletedByUser = "";
+        if (Grid == null) {
+            var numbers = document.getElementsByClassName("number");
+            for (var i = 0; i < numbers.length; i++) {
+                GridCompletedByUser += numbers[i].value;
+            }
+        } else {
+            GridCompletedByUser = Grid;
+        }
+
+        let x = new Array(9);
+
+        for (let i = 0; i < x.length; i++) {
+            x[i] = new Array(9);
+        }
+
+        let position = 0;
+        for (let y=0; y < x.length; y++) {
+            for (let z = 0; z < x[y].length; z++) {
+                x[y][z] = parseInt(GridCompletedByUser[position]);
+                position++;
+            }
+        }
+
+        return x;
+    }
+
+    //method to check anwser user
+    function Possible(y, x, n, puzzle) {
+        if (ContainsZero(puzzle)) {
+            return false;
+        }
+
+        for (i = 0; i < 9; i++) {
+            if (puzzle[y][i] == n && i != x) {
+                return false;
+            }
+        }
+        for (i = 0; i < 9; i++) {
+            if (puzzle[i][x] == n && i != y) {
+                return false;
+            }
+        }
+        x0 = Math.floor(x / 3) * 3;
+        y0 = Math.floor(y / 3) * 3;
+
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+                if (puzzle[y0 + i][x0 + j] == n && y0 + i != y && x0 + j != x) {
+                    return false;
+                }
+            }
+        }
+        return true
+
+    }
+
+    function CheckIfCorrectAnswer(answer) {
+        for (let y = 0; y < answer.length; y++) {
+            for (let z = 0; z < answer[y].length; z++) {
+                if (!Possible(y, z, answer[y][z], answer)) {
+                    return false
+                }
+            }
+        }
+        return true;
+    }
+
+    function ResultSubmitGrid() {
+        let grid = PutGridValueIntoTable();
+        return CheckIfCorrectAnswer(grid);
+    }
+    //************************************
+    // Method to get the grid's correction 
+    function PossibleBis(y, x, n, puzzle) {
+        for (i = 0; i < 9; i++) {
+            if (puzzle[y][i] == n) {
+                return false;
+            }
+        }
+        for (i = 0; i < 9; i++) {
+            if (puzzle[i][x] == n) {
+                return false;
+            }
+        }
+        x0 = Math.floor(x / 3) * 3;
+        y0 = Math.floor(y / 3) * 3;
+
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+                if (puzzle[y0 + i][x0 + j] == n) {
+                    return false;
+                }
+            }
+        }
+        return true
+
+    }
+
+    function ContainsZero(puzzle) {
+        for (i = 0; i < 9; i++) {
+            for (j = 0; j < 9; j++) {
+                if (puzzle[i][j] == 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function Sudokubis(puzzle) {
+        for (var y = 0; y < 9; y++) {
+            for (var x = 0; x < 9; x++) {
+                if (puzzle[y][x] == 0) {
+                    for (var n = 1; n < 10; n++) {
+                        if (PossibleBis(y, x, n, puzzle)) {
+                            puzzle[y][x] = n;
+                            Sudokubis(puzzle);
+                            if (!ContainsZero(puzzle)) {
+                                return;
+                            }
+                            puzzle[y][x] = 0;
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    function Sudoku(puzzle) {
+        Sudokubis(puzzle);
+        puzzleString = "";
+        for (i = 0; i < 9; i++) {
+            for (j = 0; j < 9; j++) {
+                puzzleString += puzzle[i][j];
+            }
+        }
+        return puzzleString;
+    }
+
+    function GetCorrection() {
+        let grid = PutGridValueIntoTable(GridValue);
+        let gridResolve = Sudoku(grid);
+        var numbers = document.getElementsByClassName("number");
+        for (var i = 0; i < numbers.length; i++) {
+            numbers[i].value = gridResolve[i];
+        }
+
+    }
+    //***********************************************
+    //Call mehtod via click event
+    document.getElementById('submitGrid').addEventListener("click", function () {
+        console.log(ResultSubmitGrid());
+    });
+
+    document.getElementById('correction').addEventListener("click", function () {
+        GetCorrection();
+    });
+
+</script>
+
+

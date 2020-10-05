@@ -4,7 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
+using SudokuWorld.DataAccess.Data;
+using SudokuWorld.DataAccess.Repository;
 using SudokuWorld.Models;
 using SudokuWorld.Models.ViewModels;
 
@@ -13,11 +16,11 @@ namespace SudokuWorld.Areas.Players.Controllers
     [Area("Players")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext db)
         {
-            _logger = logger;
+            _db = db;
         }
 
         public IActionResult Index()
@@ -32,7 +35,9 @@ namespace SudokuWorld.Areas.Players.Controllers
 
         public IActionResult Grids(string level)
         {
-            return View();
+            GridRepository gridRepository = new GridRepository(_db);
+            var grids = gridRepository.GetAll(g => g.Level == level,g=>g.OrderBy(g=>g.Id));
+            return View(grids);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

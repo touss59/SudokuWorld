@@ -14,6 +14,13 @@ namespace SudokuWorld.DataAccess.Data
         {
         }
 
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    base.OnConfiguring(optionsBuilder);
+
+        //    optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=SudokuWorld;Trusted_Connection=True;");
+        //}
+
         public DbSet<Grid> Grids { get; set; }
     }
 }
