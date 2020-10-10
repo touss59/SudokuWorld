@@ -24,5 +24,23 @@ namespace SudokuWorld.Areas.Players.Controllers
             var grid = gridRepository.Get(id);
             return View(grid);
         }
+
+        [HttpPost]
+        public string SubmitGrid()
+        {
+            int id = Convert.ToInt32(Request.Form["id"]);
+            int time = Convert.ToInt32(Request.Form["timer"]);
+            GridRepository gridRepository = new GridRepository(_db);
+            string info = gridRepository.AddSubmit(id, time);
+            return info;
+        }
+
+        [HttpGet]
+        public ActionResult NewGrid(int id)
+        {
+            GridRepository gridRepository = new GridRepository(_db);
+            int newId = gridRepository.GetNewGrid(id);
+            return RedirectToAction("Index", new { id = newId });
+        }
     }
 }

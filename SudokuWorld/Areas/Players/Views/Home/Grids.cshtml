@@ -11,8 +11,16 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Sudoku numéro @grid.Id</h5>
-                        <p class="card-text">Ce sudoku à été complé @grid.NbTimesCompleted fois et le temps record pour le complété est de @grid.Record secondes.</p>
-                        <a asp-area="Players" asp-controller="Grille" asp-action="Index" asp-route-id="@grid.Id" class="btn btn-primary">Essayez de battre ce record</a>
+                        @if (grid.Record == 0)
+                        {
+                            <p class="card-text">Personne n'a jamais réussi ce sudoku !</p>
+                            <a asp-area="Players" asp-controller="Grille" asp-action="Index" asp-route-id="@grid.Id" class="btn btn-success">Soyez le premier</a>
+                        }
+                        else
+                        {
+                            <p class="card-text">Ce sudoku à été complété @grid.NbTimesCompleted fois et le temps record pour le compléter est de @grid.Record secondes.</p>
+                            <a asp-area="Players" asp-controller="Grille" asp-action="Index" asp-route-id="@grid.Id" class="btn btn-primary">Essayez de battre ce record</a>
+                        }
                     </div>
                 </div>
             </div>

@@ -65,18 +65,26 @@
         </table>
         <button id="submitGrid" class="alert-secondary">Submit</button>
         <button id="correction" class="alert-secondary">Correction</button>
+        <form action="/Players/Grille/NewGrid?id=@Model.Id" method="get">
+            <button id="newGrid" class="alert-success" style="display:none;">Essayer une nouvelle grille</button>
+        </form>
     </div>
 </div>
 <script>
     let GridValue = "@Model.Value";
-
+    var numbers;
+    let timer = 1;
+    let interval = setInterval(function () {
+        timer += 1;
+        console.log(timer);
+    }, 1000);
 
     // Convert the string into an array 9x9
     function PutGridValueIntoTable(Grid) {
         let GridCompletedByUser = "";
         if (Grid == null) {
-            var numbers = document.getElementsByClassName("number");
-            for (var i = 0; i < numbers.length; i++) {
+            numbers = document.getElementsByClassName("number");
+            for (let i = 0; i < numbers.length; i++) {
                 GridCompletedByUser += numbers[i].value;
             }
         } else {
@@ -134,7 +142,7 @@
         for (let y = 0; y < answer.length; y++) {
             for (let z = 0; z < answer[y].length; z++) {
                 if (!Possible(y, z, answer[y][z], answer)) {
-                    return false
+                    return false;
                 }
             }
         }
@@ -146,7 +154,7 @@
         return CheckIfCorrectAnswer(grid);
     }
     //************************************
-    // Method to get the grid's correction 
+    // Method to get the grid's correction
     function PossibleBis(y, x, n, puzzle) {
         for (i = 0; i < 9; i++) {
             if (puzzle[y][i] == n) {
@@ -184,10 +192,10 @@
     }
 
     function Sudokubis(puzzle) {
-        for (var y = 0; y < 9; y++) {
-            for (var x = 0; x < 9; x++) {
+        for (let y = 0; y < 9; y++) {
+            for (let x = 0; x < 9; x++) {
                 if (puzzle[y][x] == 0) {
-                    for (var n = 1; n < 10; n++) {
+                    for (let n = 1; n < 10; n++) {
                         if (PossibleBis(y, x, n, puzzle)) {
                             puzzle[y][x] = n;
                             Sudokubis(puzzle);
@@ -217,21 +225,42 @@
     function GetCorrection() {
         let grid = PutGridValueIntoTable(GridValue);
         let gridResolve = Sudoku(grid);
-        var numbers = document.getElementsByClassName("number");
+        numbers = document.getElementsByClassName("number");
         for (var i = 0; i < numbers.length; i++) {
             numbers[i].value = gridResolve[i];
         }
-
+        //document.getElementById("submitGrid").disabled = true;
     }
     //***********************************************
     //Call mehtod via click event
-    document.getElementById('submitGrid').addEventListener("click", function () {
-        console.log(ResultSubmitGrid());
+    document.getElementById("submitGrid").addEventListener("click", function () {
+        if (ResultSubmitGrid()) {
+            clearInterval(interval);
+            SubmitGrid();
+        }
     });
 
-    document.getElementById('correction').addEventListener("click", function () {
+    document.getElementById("correction").addEventListener("click", function () {
         GetCorrection();
     });
+
+    function SubmitGrid() {
+     $.ajax({
+       url: '@Url.Action("SubmitGrid", "Grille")',
+       type: 'Post',
+       dataType: 'text',
+         cache: false,
+         data: { 'id': @Model.Id, 'timer': timer },
+       success: function (results) {
+           alert(results);
+           $(".alert-secondary").hide();
+           $(".alert-success").show();
+       },
+       error: function () {
+        alert('Error occured');
+       }
+     });
+    }
 
 </script>
 
