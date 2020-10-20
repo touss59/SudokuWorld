@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SudokuWorld.DataAccess.Data;
 using SudokuWorld.DataAccess.Repository;
+using SudokuWorld.Utility;
 
 namespace SudokuWorld.Areas.Players.Controllers
 {
@@ -26,13 +27,28 @@ namespace SudokuWorld.Areas.Players.Controllers
         }
 
         [HttpPost]
-        public string SubmitGrid()
+        public JsonResult SubmitGrid()
         {
             int id = Convert.ToInt32(Request.Form["id"]);
             int time = Convert.ToInt32(Request.Form["timer"]);
+            string numbers = Request.Form["numbers"];
             GridRepository gridRepository = new GridRepository(_db);
-            string info = gridRepository.AddSubmit(id, time);
-            return info;
+            string initalgrid = gridRepository.Get(id).Value;
+            string result = CheckSudoku.Solve(initalgrid);
+            string info = "La grille a été mal complétée";
+            if (result == numbers)
+            {
+            info = gridRepository.AddSubmit(id, time);
+            }
+            if (numbers == "")
+            {
+                info = "Voici la correction";
+            }
+            if(numbers!= "" && numbers != result)
+            {
+                result = CheckSudoku.GetErrors(result, numbers);
+            }
+            return Json(new { info, result });
         }
 
         [HttpGet]

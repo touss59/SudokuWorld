@@ -71,190 +71,67 @@
     </div>
 </div>
 <script>
-    let GridValue = "@Model.Value";
-    var numbers;
+    let numbers;
+    let numberString = "";;
     let timer = 1;
     let interval = setInterval(function () {
         timer += 1;
         console.log(timer);
     }, 1000);
 
-    // Convert the string into an array 9x9
-    function PutGridValueIntoTable(Grid) {
-        let GridCompletedByUser = "";
-        if (Grid == null) {
-            numbers = document.getElementsByClassName("number");
-            for (let i = 0; i < numbers.length; i++) {
-                GridCompletedByUser += numbers[i].value;
-            }
-        } else {
-            GridCompletedByUser = Grid;
-        }
-
-        let x = new Array(9);
-
-        for (let i = 0; i < x.length; i++) {
-            x[i] = new Array(9);
-        }
-
-        let position = 0;
-        for (let y=0; y < x.length; y++) {
-            for (let z = 0; z < x[y].length; z++) {
-                x[y][z] = parseInt(GridCompletedByUser[position]);
-                position++;
-            }
-        }
-
-        return x;
-    }
-
-    //method to check anwser user
-    function Possible(y, x, n, puzzle) {
-        if (ContainsZero(puzzle)) {
-            return false;
-        }
-
-        for (i = 0; i < 9; i++) {
-            if (puzzle[y][i] == n && i != x) {
-                return false;
-            }
-        }
-        for (i = 0; i < 9; i++) {
-            if (puzzle[i][x] == n && i != y) {
-                return false;
-            }
-        }
-        x0 = Math.floor(x / 3) * 3;
-        y0 = Math.floor(y / 3) * 3;
-
-        for (i = 0; i < 3; i++) {
-            for (j = 0; j < 3; j++) {
-                if (puzzle[y0 + i][x0 + j] == n && y0 + i != y && x0 + j != x) {
-                    return false;
-                }
-            }
-        }
-        return true
-
-    }
-
-    function CheckIfCorrectAnswer(answer) {
-        for (let y = 0; y < answer.length; y++) {
-            for (let z = 0; z < answer[y].length; z++) {
-                if (!Possible(y, z, answer[y][z], answer)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    function ResultSubmitGrid() {
-        let grid = PutGridValueIntoTable();
-        return CheckIfCorrectAnswer(grid);
-    }
-    //************************************
-    // Method to get the grid's correction
-    function PossibleBis(y, x, n, puzzle) {
-        for (i = 0; i < 9; i++) {
-            if (puzzle[y][i] == n) {
-                return false;
-            }
-        }
-        for (i = 0; i < 9; i++) {
-            if (puzzle[i][x] == n) {
-                return false;
-            }
-        }
-        x0 = Math.floor(x / 3) * 3;
-        y0 = Math.floor(y / 3) * 3;
-
-        for (i = 0; i < 3; i++) {
-            for (j = 0; j < 3; j++) {
-                if (puzzle[y0 + i][x0 + j] == n) {
-                    return false;
-                }
-            }
-        }
-        return true
-
-    }
-
-    function ContainsZero(puzzle) {
-        for (i = 0; i < 9; i++) {
-            for (j = 0; j < 9; j++) {
-                if (puzzle[i][j] == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    function Sudokubis(puzzle) {
-        for (let y = 0; y < 9; y++) {
-            for (let x = 0; x < 9; x++) {
-                if (puzzle[y][x] == 0) {
-                    for (let n = 1; n < 10; n++) {
-                        if (PossibleBis(y, x, n, puzzle)) {
-                            puzzle[y][x] = n;
-                            Sudokubis(puzzle);
-                            if (!ContainsZero(puzzle)) {
-                                return;
-                            }
-                            puzzle[y][x] = 0;
-                        }
-                    }
-                    return;
-                }
-            }
-        }
-    }
-
-    function Sudoku(puzzle) {
-        Sudokubis(puzzle);
-        puzzleString = "";
-        for (i = 0; i < 9; i++) {
-            for (j = 0; j < 9; j++) {
-                puzzleString += puzzle[i][j];
-            }
-        }
-        return puzzleString;
-    }
-
-    function GetCorrection() {
-        let grid = PutGridValueIntoTable(GridValue);
-        let gridResolve = Sudoku(grid);
+    function UserResponse() {
+        numberString = "";
         numbers = document.getElementsByClassName("number");
-        for (var i = 0; i < numbers.length; i++) {
-            numbers[i].value = gridResolve[i];
+        for (let i = 0; i < numbers.length; i++) {
+            numberString += numbers[i].value;
         }
         //document.getElementById("submitGrid").disabled = true;
     }
     //***********************************************
     //Call mehtod via click event
     document.getElementById("submitGrid").addEventListener("click", function () {
-        if (ResultSubmitGrid()) {
-            clearInterval(interval);
-            SubmitGrid();
-        }
+        UserResponse();
+        SubmitGrid();
     });
 
     document.getElementById("correction").addEventListener("click", function () {
-        GetCorrection();
+        numberString = null;
+        SubmitGrid();
     });
 
     function SubmitGrid() {
      $.ajax({
        url: '@Url.Action("SubmitGrid", "Grille")',
        type: 'Post',
-       dataType: 'text',
+       dataType: 'json',
          cache: false,
-         data: { 'id': @Model.Id, 'timer': timer },
-       success: function (results) {
-           alert(results);
-           $(".alert-secondary").hide();
-           $(".alert-success").show();
+         data: { 'id': @Model.Id, 'timer': timer, 'numbers': numberString },
+         success: function (response) {
+             alert(response.info);
+             if (response.info != "La grille a été mal complétée") {
+                 clearInterval(interval);
+                 if (response.info == "Voici la correction") {
+                     numbers = document.getElementsByClassName("number");
+                     $('.number').css('background-color', ''); 
+                     for (let i = 0; i < numbers.length; i++) {
+                         numbers[i].value = response.result[i];
+                     }
+                 }
+                 $(".alert-secondary").hide();
+                 $(".alert-success").show();
+             } else {
+                 let errorsIndex = response.result.split(",");
+                 numbers = document.getElementsByClassName("number");
+                 console.log(response.result);
+                 $('.number').css('background-color', '');
+                 let indexError = 0;
+                 for (let i = 0; i < numbers.length; i++) {
+                     if (i = errorsIndex[indexError]) {
+                         numbers[i].style.backgroundColor = "red";
+                         indexError++;
+                     }
+                 }
+             }
        },
        error: function () {
         alert('Error occured');
