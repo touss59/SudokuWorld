@@ -65,19 +65,24 @@
         </table>
         <button id="submitGrid" class="alert-secondary">Submit</button>
         <button id="correction" class="alert-secondary">Correction</button>
-        <form action="/Players/Grille/NewGrid?id=@Model.Id" method="get">
-            <button id="newGrid" class="alert-success" style="display:none;">Essayer une nouvelle grille</button>
-        </form>
+        <a id="newGrid" href="/Players/Grille/NewGrid?id=@Model.Id" class="btn alert-success"  style="display:none;">Essayer une nouvelle grille</a>
     </div>
 </div>
 <script>
-    let numbers;
+    let numbers = document.getElementsByClassName("number");;
     let numberString = "";;
     let timer = 1;
     let interval = setInterval(function () {
         timer += 1;
         console.log(timer);
     }, 1000);
+
+    for (let i = 0; i < numbers.length; i++) {
+        if (numbers[i].value != 0) {
+            numbers[i].disabled = true;
+        }
+    }
+    
 
     function UserResponse() {
         numberString = "";

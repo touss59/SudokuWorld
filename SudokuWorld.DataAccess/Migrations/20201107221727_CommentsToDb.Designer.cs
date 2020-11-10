@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SudokuWorld.DataAccess.Data;
 
 namespace SudokuWorld.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201107221727_CommentsToDb")]
+    partial class CommentsToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -299,30 +301,6 @@ namespace SudokuWorld.DataAccess.Migrations
                     b.ToTable("Grids");
                 });
 
-            modelBuilder.Entity("SudokuWorld.Models.Rank", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("XP")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Ranks");
-                });
-
             modelBuilder.Entity("SudokuWorld.Models.Results", b =>
                 {
                     b.Property<int>("Id")
@@ -358,6 +336,9 @@ namespace SudokuWorld.DataAccess.Migrations
             modelBuilder.Entity("SudokuWorld.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<int>("XP")
+                        .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
@@ -422,7 +403,7 @@ namespace SudokuWorld.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -437,15 +418,6 @@ namespace SudokuWorld.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SudokuWorld.Models.Rank", b =>
-                {
-                    b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SudokuWorld.Models.Results", b =>
                 {
                     b.HasOne("SudokuWorld.Models.Grid", "Grid")
@@ -455,7 +427,7 @@ namespace SudokuWorld.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Results")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

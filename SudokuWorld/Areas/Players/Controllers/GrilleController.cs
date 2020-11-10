@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SudokuWorld.DataAccess.Data;
 using SudokuWorld.DataAccess.Repository;
+using SudokuWorld.Models;
 using SudokuWorld.Utility;
 
 namespace SudokuWorld.Areas.Players.Controllers
@@ -29,24 +33,33 @@ namespace SudokuWorld.Areas.Players.Controllers
         [HttpPost]
         public JsonResult SubmitGrid()
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             int id = Convert.ToInt32(Request.Form["id"]);
             int time = Convert.ToInt32(Request.Form["timer"]);
             string numbers = Request.Form["numbers"];
             GridRepository gridRepository = new GridRepository(_db);
+            ResultsRepository resultsRepository = new ResultsRepository(_db);
             string initalgrid = gridRepository.Get(id).Value;
             string result = CheckSudoku.Solve(initalgrid);
             string info = "La grille a été mal complétée";
             if (result == numbers)
             {
-            info = gridRepository.AddSubmit(id, time);
+                info = gridRepository.AddSubmit(id, time);
+                if(claim!=null)
+                    resultsRepository.AddResult(id, claim, time, false,claimsIdentity); 
             }
             if (numbers == "")
             {
                 info = "Voici la correction";
+                if(claim!=null)
+                    resultsRepository.AddResult(id, claim, 9999, true, claimsIdentity);
             }
             if(numbers!= "" && numbers != result)
             {
                 result = CheckSudoku.GetErrors(result, numbers);
+                if(claim!=null)
+                    resultsRepository.AddResult(id, claim, 9999, false, claimsIdentity);
             }
             return Json(new { info, result });
         }
@@ -54,8 +67,10 @@ namespace SudokuWorld.Areas.Players.Controllers
         [HttpGet]
         public ActionResult NewGrid(int id)
         {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             GridRepository gridRepository = new GridRepository(_db);
-            int newId = gridRepository.GetNewGrid(id);
+            int newId = gridRepository.GetNewGrid(claim, id);
             return RedirectToAction("Index", new { id = newId });
         }
     }

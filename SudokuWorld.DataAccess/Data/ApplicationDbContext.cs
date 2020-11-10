@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SudokuWorld.DataAccess.Migrations;
 using SudokuWorld.Models;
 
 namespace SudokuWorld.DataAccess.Data
@@ -22,5 +23,10 @@ namespace SudokuWorld.DataAccess.Data
         //}
 
         public DbSet<Grid> Grids { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Results> Results { get; set; }
+        public DbSet<Difficulty> Difficulties { get; set; }
+        public DbSet<Comments> Comments { get; set; }
+        public DbSet<Rank> Ranks { get; set; }
     }
 }

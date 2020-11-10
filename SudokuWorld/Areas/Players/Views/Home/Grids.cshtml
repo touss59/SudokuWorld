@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SudokuWorld.Models.Grid>
+﻿@model IOrderedEnumerable<SudokuWorld.Models.Grid>
 
 @{
     ViewData["Title"] = "Grids";
@@ -11,7 +11,12 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Sudoku numéro @grid.Id</h5>
-                        @if (grid.Record == 0)
+                        @if (grid.IsDoneByUser)
+                        {
+                            <p class="card-text">Sudoku déjà essayé ou fait.</p>
+                            @*<a asp-area="Players" asp-controller="Grille" asp-action="Index" asp-route-id="@grid.Id" class="btn btn-success">Soyez le premier</a>*@
+                        }
+                        else if (grid.Record == 0)
                         {
                             <p class="card-text">Personne n'a jamais réussi ce sudoku !</p>
                             <a asp-area="Players" asp-controller="Grille" asp-action="Index" asp-route-id="@grid.Id" class="btn btn-success">Soyez le premier</a>

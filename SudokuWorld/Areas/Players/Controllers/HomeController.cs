@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,7 +37,9 @@ namespace SudokuWorld.Areas.Players.Controllers
         public IActionResult Grids(string level)
         {
             GridRepository gridRepository = new GridRepository(_db);
-            var grids = gridRepository.GetAll(g => g.Level == level,g=>g.OrderBy(g=>g.Id));
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            IOrderedEnumerable<Grid> grids = gridRepository.GetGrids(level, claim);
             return View(grids);
         }
 

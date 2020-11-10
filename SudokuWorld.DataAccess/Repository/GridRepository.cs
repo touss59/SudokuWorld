@@ -4,6 +4,7 @@ using SudokuWorld.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 
 namespace SudokuWorld.DataAccess.Repository
@@ -28,6 +29,25 @@ namespace SudokuWorld.DataAccess.Repository
             }
         }
 
+        public IOrderedEnumerable<Grid> GetGrids(string level,Claim claim)
+        {
+            var grids = _db.Grids.Where(g => g.Difficulty.Level == level).ToList().OrderBy(g => g.Id);
+            if (claim == null)
+            {
+                return grids;
+            }
+            int[] idsGrids = _db.Results.Where(r => r.UserId == claim.Value && (r.SucceedTime!=9999 || r.IsGiveUp==true)).Select(r => r.GridId).ToArray();
+            for(int i = 0; i < grids.Count(); i++)
+            {
+                if (idsGrids.Contains(grids.ElementAt(i).Id))
+                {
+                    grids.ElementAt(i).IsDoneByUser = true;
+                }
+            }
+            return grids;
+
+        }
+
         public string AddSubmit(int id,int time)
         {
             string information = "Bravo !";
@@ -45,17 +65,38 @@ namespace SudokuWorld.DataAccess.Repository
             return information;
         }
 
-        public int GetNewGrid(int id)
+        public int GetNewGrid(Claim claim, int id)
         {
-            int newId=id;
-            string gridNowLevel = _db.Grids.Where(g => g.Id == id).Select(g=>g.Level).FirstOrDefault();
-            int idGridFromDb = _db.Grids.Where(g=>g.Level==gridNowLevel && g.Id!=id).OrderBy(g => g.Record).Select(g=>g.Id).FirstOrDefault();
-            if (idGridFromDb == 0)
+            string gridNowLevel = _db.Grids.Where(g => g.Id == id).Select(g=>g.Difficulty.Level).FirstOrDefault();
+            List<int> idsGridFromDb = _db.Grids.Where(g=>g.Difficulty.Level==gridNowLevel && g.Id!=id).OrderBy(g => g.Record).Select(g=>g.Id).ToList();
+            if (idsGridFromDb.Count>0)
             {
-                idGridFromDb= _db.Grids.Where(g =>g.Id != id).OrderBy(g => g.Record).Select(g => g.Id).FirstOrDefault();
+                foreach(int gId in idsGridFromDb)
+                {
+                    if (!GridIsDoneByUser(claim, gId))
+                    {
+                        return gId;
+                    }
+                }
             }
-            newId = idGridFromDb;
-            return newId;
+            idsGridFromDb = _db.Grids.Where(g => g.Id != id).OrderBy(g => g.Difficulty.Id).Select(g => g.Id).ToList();
+            foreach (int gId in idsGridFromDb)
+            {
+                if (!GridIsDoneByUser(claim, gId))
+                {
+                    return gId;
+                }
+            }
+            return id;
+        }
+
+        public bool GridIsDoneByUser(Claim claim, int idGrid)
+        {
+            if (claim == null)
+            {
+                return false;
+            }
+            return _db.Results.Where(r => r.GridId == idGrid && r.UserId == claim.Value && (r.SucceedTime != 9999 || r.IsGiveUp)).Count() > 0;
         }
     }
 }

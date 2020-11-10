@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SudokuWorld.DataAccess.Data;
 
 namespace SudokuWorld.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201103181238_DifficultyLevel")]
+    partial class DifficultyLevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,38 +223,6 @@ namespace SudokuWorld.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SudokuWorld.Models.Comments", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("GridId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GridLevel")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Quote")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Satisfaction")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GridId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
-                });
-
             modelBuilder.Entity("SudokuWorld.Models.Difficulty", b =>
                 {
                     b.Property<int>("Id")
@@ -279,8 +249,11 @@ namespace SudokuWorld.DataAccess.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("DifficultyId")
-                        .IsRequired()
                         .HasColumnType("int");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NbTimesCompleted")
                         .HasColumnType("int");
@@ -297,30 +270,6 @@ namespace SudokuWorld.DataAccess.Migrations
                     b.HasIndex("DifficultyId");
 
                     b.ToTable("Grids");
-                });
-
-            modelBuilder.Entity("SudokuWorld.Models.Rank", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("XP")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Ranks");
                 });
 
             modelBuilder.Entity("SudokuWorld.Models.Results", b =>
@@ -358,6 +307,9 @@ namespace SudokuWorld.DataAccess.Migrations
             modelBuilder.Entity("SudokuWorld.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<int>("XP")
+                        .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
@@ -413,37 +365,11 @@ namespace SudokuWorld.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SudokuWorld.Models.Comments", b =>
-                {
-                    b.HasOne("SudokuWorld.Models.Grid", "Grid")
-                        .WithMany("Comments")
-                        .HasForeignKey("GridId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SudokuWorld.Models.Grid", b =>
                 {
                     b.HasOne("SudokuWorld.Models.Difficulty", "Difficulty")
                         .WithMany()
-                        .HasForeignKey("DifficultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SudokuWorld.Models.Rank", b =>
-                {
-                    b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DifficultyId");
                 });
 
             modelBuilder.Entity("SudokuWorld.Models.Results", b =>
@@ -455,7 +381,7 @@ namespace SudokuWorld.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("SudokuWorld.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Results")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
