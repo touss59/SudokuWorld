@@ -48,8 +48,6 @@ namespace SudokuWorld.DataAccess.Repository
                     Rank newRank = new Rank { UserId = claim.Value, XP = xpGrid, UserName=claimsIdentity.Name};
                     _db.Ranks.Add(newRank);
                 }
-                //ApplicationUser applicationUser = _db.ApplicationUsers.Where(u => u.Id == claim.Value).FirstOrDefault();
-                //applicationUser.XP += xpGrid;
             }
             _db.Results.Add(newResults);
             _db.SaveChanges();

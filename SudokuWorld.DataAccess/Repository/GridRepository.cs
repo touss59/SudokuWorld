@@ -65,7 +65,7 @@ namespace SudokuWorld.DataAccess.Repository
             return information;
         }
 
-        public int GetNewGrid(Claim claim, int id)
+        public int GetNewGridId(Claim claim, int id)
         {
             string gridNowLevel = _db.Grids.Where(g => g.Id == id).Select(g=>g.Difficulty.Level).FirstOrDefault();
             List<int> idsGridFromDb = _db.Grids.Where(g=>g.Difficulty.Level==gridNowLevel && g.Id!=id).OrderBy(g => g.Record).Select(g=>g.Id).ToList();

@@ -40,8 +40,8 @@ namespace SudokuWorld.Areas.Players.Controllers
             string numbers = Request.Form["numbers"];
             GridRepository gridRepository = new GridRepository(_db);
             ResultsRepository resultsRepository = new ResultsRepository(_db);
-            string initalgrid = gridRepository.Get(id).Value;
-            string result = CheckSudoku.Solve(initalgrid);
+            string initialgrid = gridRepository.Get(id).Value;
+            string result = CheckSudoku.Solve(initialgrid);
             string info = "La grille a été mal complétée";
             if (result == numbers)
             {
@@ -70,7 +70,7 @@ namespace SudokuWorld.Areas.Players.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             GridRepository gridRepository = new GridRepository(_db);
-            int newId = gridRepository.GetNewGrid(claim, id);
+            int newId = gridRepository.GetNewGridId(claim, id);
             return RedirectToAction("Index", new { id = newId });
         }
     }

@@ -46,8 +46,9 @@
     }
 </style>
 <div>
-    <h1>A vous de jouer</h1>
+    <h1>Let's go</h1>
     <div class="container">
+        <span id="timer" style="border:solid;border-color:black;padding:2px">Timer : 0</span>
         <table>
             @{
                 for (int i = 0; i < 9; i++)
@@ -71,9 +72,10 @@
 <script>
     let numbers = document.getElementsByClassName("number");;
     let numberString = "";;
-    let timer = 1;
+    let timer = 0;
     let interval = setInterval(function () {
         timer += 1;
+        document.getElementById("timer").innerHTML =`Timer : ${timer}`;
         console.log(timer);
     }, 1000);
 
@@ -82,7 +84,6 @@
             numbers[i].disabled = true;
         }
     }
-    
 
     function UserResponse() {
         numberString = "";

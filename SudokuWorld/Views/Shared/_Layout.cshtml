@@ -6,6 +6,10 @@
     <title>@ViewData["Title"] - SudokuWorld</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
     <header>
@@ -35,6 +39,9 @@
                                 <a class="dropdown-item" asp-area="Players" asp-controller="Home" asp-action="Grids" asp-route-level="Hard">Hard</a>
                             </div>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Players" asp-controller="RankStats" asp-action="Ranks">Ranks</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -51,7 +58,6 @@
             &copy; 2020 - SudokuWorld - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
